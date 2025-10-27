@@ -1,30 +1,64 @@
-
 const themeToggle = document.getElementById('themeToggle');
-themeToggle.addEventListener('click', () => {
-  document.body.classList.toggle('dark');
-  localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
-});
-
-
 const accentPicker = document.getElementById('accentColor');
-accentPicker.addEventListener('input', (e) => {
-  document.documentElement.style.setProperty('--accent-color', e.target.value);
-  localStorage.setItem('accentColor', e.target.value);
-});
+const newsletterForm = document.getElementById('newsletterForm');
 
 
-window.addEventListener('DOMContentLoaded', () => {
-  const savedTheme = localStorage.getItem('theme');
+// Theme Management
+
+function initializeTheme() {
+  const savedTheme = localStorage.getItem('theme') || 'light';
   const savedAccent = localStorage.getItem('accentColor');
 
-  if (savedTheme === 'dark') document.body.classList.add('dark');
-  if (savedAccent) document.documentElement.style.setProperty('--accent-color', savedAccent);
+  if (savedTheme === 'dark') {
+    document.body.classList.add('dark');
+    updateThemeToggleButton(true);
+  }
+
+  if (savedAccent) {
+    document.documentElement.style.setProperty('--accent-color', savedAccent);
+    accentPicker.value = savedAccent;
+  }
+}
+
+/**
+ * Update theme toggle button appearance
+ * @param {boolean} isDark - True if dark mode is active
+ */
+function updateThemeToggleButton(isDark) {
+  themeToggle.textContent = isDark ? '☀️' : '🌙';
+}
+
+themeToggle.addEventListener('click', () => {
+  const isDark = document.body.classList.toggle('dark');
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  updateThemeToggleButton(isDark);
 });
 
 
-const form = document.getElementById('newsletterForm');
-form.addEventListener('submit', e => {
-  e.preventDefault();
-  alert("Thank you for subscribing!");
-  form.reset();
+// Accent Color Management
+accentPicker.addEventListener('input', (event) => {
+  const color = event.target.value;
+  document.documentElement.style.setProperty('--accent-color', color);
+  localStorage.setItem('accentColor', color);
+});
+
+
+// Form Handling
+
+if (newsletterForm) {
+  newsletterForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+
+    const emailInput = newsletterForm.querySelector('input[type="email"]');
+    const email = emailInput.value;
+    alert('Thank you for subscribing! 🎉');
+    newsletterForm.reset();
+  });
+}
+
+
+// Initialization
+
+document.addEventListener('DOMContentLoaded', () => {
+  initializeTheme();
 });
